@@ -1,0 +1,28 @@
+# ===== Build artifacts =====
+build/
+install/
+log/
+
+# ===== IDE configurations =====
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+dist/
+
+# ===== Colcon =====
+src/**/COLCON_IGNORE
+
+# ===== Claude Code =====
+.claude/
+
+# ===== OS files =====
+.DS_Store
+Thumbs.db

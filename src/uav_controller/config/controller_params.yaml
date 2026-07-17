@@ -1,0 +1,6 @@
+/controller_node:
+  ros__parameters:
+    control_rate: 50.0             # Hz — setpoint update rate
+    goal_tolerance_xy: 0.3         # meters — arrival detection
+    goal_tolerance_z: 0.3          # meters
+    auto_hold: true                # hold position when no goal received

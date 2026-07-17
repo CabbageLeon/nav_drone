@@ -1,0 +1,14 @@
+# Navigate to an ENU target pose — future use with uav_planner
+geometry_msgs/PoseStamped target_pose  # ENU
+float32 position_tolerance 0.2         # meters
+float32 yaw_tolerance 0.1              # radians
+---
+bool success
+string message
+---
+int32 STATUS_IDLE=0
+int32 STATUS_MOVING=1
+int32 STATUS_ARRIVED=2
+int32 STATUS_ABORTED=3
+int32 status
+float32 distance_to_goal

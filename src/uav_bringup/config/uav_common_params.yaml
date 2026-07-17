@@ -1,0 +1,22 @@
+# UAV Common Parameters — global defaults inherited by all nodes
+# Individual node overrides go in their respective config/<node>_params.yaml
+
+/**:
+  ros__parameters:
+    # Frame conventions
+    odom_frame_id: "odom"
+    base_link_frame_id: "base_link"
+    map_frame_id: "map"
+
+    # Coordinate frame: "enu" (ROS standard) or "ned" (PX4 native)
+    # All internal modules use ENU; only px4_bridge converts at the boundary
+    internal_frame: "enu"
+
+    # Default operation
+    auto_arm: false                 # arming requires explicit user confirmation
+    auto_takeoff_height: -5.0       # NED meters (negative = up)
+
+    # Safety limits
+    max_altitude: 50.0              # meters (ENU)
+    min_altitude: 0.5               # meters above ground
+    geofence_radius: 100.0          # meters from origin

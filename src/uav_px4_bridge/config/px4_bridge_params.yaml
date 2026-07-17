@@ -1,0 +1,15 @@
+/px4_bridge_node:
+  ros__parameters:
+    # Auto arm/offboard sequence (SETUP → OFFBOARD → ARM → CONTROL)
+    enable_auto_sequence: true
+
+    # odom frame convention:
+    #   "ned" — PX4 native (odom = PX4 local NED origin). Default.
+    #   "enu" — ROS standard (odom = East-North-Up). For RViz/Nav2 interop.
+    odom_frame_convention: "enu"
+
+    # External odometry forwarding (HW with SLAM)
+    # When enabled, subscribes to odometry_forwarding_topic, calibrates Z-offset
+    # from first 10 samples, then forwards to PX4 as vehicle_visual_odometry.
+    enable_odometry_forwarding: false
+    odometry_forwarding_topic: "/Odometry"   # Fast-LIO / Point-LIO default topic

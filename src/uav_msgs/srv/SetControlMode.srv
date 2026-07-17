@@ -1,0 +1,5 @@
+# Set control mode (placeholder — currently only MODE_POSITION exists)
+uint8 control_mode
+---
+bool success
+string message
