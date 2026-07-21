@@ -1,8 +1,11 @@
 """
-control_only.launch.py — 启动完整控制链：雷达驱动 + Fast-LIO + MAVROS/PX4 + 控制链
+sensors_only.launch.py — 仅启动传感器 + MAVROS + 桥接，不含 offboard 控制
 
 用法:
-  ros2 launch uav_bringup control_only.launch.py
+  ros2 launch uav_bringup sensors_only.launch.py
+
+启动后手动启动 mission:
+  ros2 run uav_controller mission_node
 """
 
 import os
@@ -18,12 +21,8 @@ def generate_launch_description():
         get_package_share_directory('uav_px4_bridge'), 'config', 'px4_bridge_params.yaml')
     tf_params = os.path.join(
         get_package_share_directory('uav_tf_broadcaster'), 'config', 'tf_broadcaster_params.yaml')
-    controller_params = os.path.join(
-        get_package_share_directory('uav_controller'), 'config', 'controller_params.yaml')
 
     # ── 雷达驱动 + Fast-LIO ──
-    # mapping_mid360.launch.py 内部已 IncludeLaunchDescription 引入 Livox MID360 驱动，
-    # 无需单独启动雷达驱动。传入 rviz:=false 关闭 RViz 可视化。
     lio_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(get_package_share_directory('fast_lio'),
@@ -33,9 +32,6 @@ def generate_launch_description():
     )
 
     # ── MAVROS / PX4 ──
-    # px4.launch 位于 /opt/ros/humble/share/mavros/launch/px4.launch (XML 格式)，
-    # 内部 include node.launch 并加载 px4_pluginlists.yaml + px4_config.yaml。
-    # fcu_url 默认 /dev/ttyACM0:57600，此处用 /dev/px4:921600 适配真机串口。
     mavros_px4 = ExecuteProcess(
         cmd=['ros2', 'launch', 'mavros', 'px4.launch',
              'fcu_url:=/dev/px4:921600'],
@@ -43,7 +39,7 @@ def generate_launch_description():
         name='mavros_px4',
     )
 
-    # ── 控制链 ──
+    # ── 桥接 + TF（不含 controller/mission）──
     bridge = Node(
         package='uav_px4_bridge', executable='px4_bridge_node',
         name='px4_bridge_node', output='screen',
@@ -54,24 +50,10 @@ def generate_launch_description():
         name='tf_broadcaster_node', output='screen',
         emulate_tty=True, parameters=[tf_params],
     )
-    controller = Node(
-        package='uav_controller', executable='controller_node',
-        name='controller_node', output='screen',
-        emulate_tty=True, parameters=[controller_params],
-    )
-    mission = Node(
-        package='uav_controller', executable='mission_node',
-        name='mission_node', output='screen',
-        emulate_tty=True,
-    )
 
     return LaunchDescription([
-        # 硬件驱动 + 建图 + PX4 通信（并行启动）
         lio_launch,
         mavros_px4,
-        # 控制链（延迟启动，等待 MAVROS 就绪）
         TimerAction(period=5.0, actions=[bridge]),
         TimerAction(period=5.5, actions=[tf_node]),
-        TimerAction(period=6.0, actions=[controller]),
-        TimerAction(period=8.0, actions=[mission]),
     ])

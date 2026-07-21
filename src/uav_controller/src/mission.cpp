@@ -1,5 +1,5 @@
 /**
- * mission — 起飞 1m → 前飞 1m → 降落到近地 → 悬停
+ * mission — 起飞 0.5m → 前飞 1m → 降落
  * 通过 /uav/goal 发布位置目标，依赖 bridge 的 auto_sequence 完成 offboard + arm。
  */
 
@@ -24,9 +24,8 @@ public:
   }
 
 private:
-  static constexpr double TAKEOFF_Z = 1.0;   // 1m up
+  static constexpr double TAKEOFF_Z = 0.5;   // 0.5m up
   static constexpr double FORWARD_X = 1.0;   // 1m forward
-  static constexpr double GROUND_Z = 0.15;   // near ground
 
   enum Phase { WAIT_ARM, TAKEOFF, FORWARD, LAND, DONE };
   Phase phase_{WAIT_ARM};
@@ -50,6 +49,18 @@ private:
     cmd.pose.pose.position.x = x;
     cmd.pose.pose.position.y = y;
     cmd.pose.pose.position.z = z;
+    cmd.yaw = NAN;
+    goal_pub_->publish(cmd);
+  }
+
+  void send_land()
+  {
+    uav_msgs::msg::ControlCommand cmd;
+    cmd.control_mode = uav_msgs::msg::ControlCommand::MODE_LAND;
+    cmd.pose.header.frame_id = "odom";
+    cmd.pose.pose.position.x = cur_x_;
+    cmd.pose.pose.position.y = 0;
+    cmd.pose.pose.position.z = cur_z_;
     cmd.yaw = NAN;
     goal_pub_->publish(cmd);
   }
@@ -90,9 +101,9 @@ private:
       break;
 
     case LAND:
-      send_goal(FORWARD_X, 0, GROUND_Z);
-      if (at_target(GROUND_Z, cur_z_, 0.15))
-      { phase_ = DONE; RCLCPP_INFO(get_logger(), "Mission complete — hovering at %.2fm", GROUND_Z); }
+      send_land();
+      if ((get_clock()->now() - phase_start_).seconds() > 10.0)
+      { phase_ = DONE; RCLCPP_INFO(get_logger(), "Mission complete — landing triggered"); }
       break;
 
     case DONE:

@@ -1,24 +1,21 @@
 /tf_broadcaster_node:
   ros__parameters:
-    # Sensor extrinsic calibration — position relative to base_link (FLU body frame)
-    # base_link origin: drone center of mass
-    # X = forward, Y = left, Z = up
+    # Sensor extrinsic calibration — position (m) + orientation (degrees)
+    # base_link origin: drone center of mass, FLU frame (X=forward, Y=left, Z=up)
+    # roll/pitch/yaw: degrees, 右手定则, ZYX 内旋顺序
     sensors:
       camera:
-        x: 0.3      # 30cm forward of center
-        y: 0.0      # centered laterally
-        z: -0.1     # 10cm below center
+        x: 0.3
+        y: 0.0
+        z: -0.1
         roll: 0.0
-        pitch: 0.0  # forward-facing
+        pitch: 0.0
         yaw: 0.0
 
       lidar:
         x: 0.0
         y: 0.0
-        z: 0.1      # 10cm above center (top-mounted)
-
-      radar:
-        x: 0.0
-        y: 0.0
-        z: -0.2     # 20cm below center (bottom-mounted)
-        pitch: -1.5708  # downward-facing (90° pitch down)
+        z: 0.1
+        roll: 0.0
+        pitch: 20.0    # 低头为正
+        yaw: 0.0
