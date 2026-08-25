@@ -1,0 +1,9 @@
+/mission_node:
+  ros__parameters:
+    publish_rate_hz: 10.0
+    takeoff_height_m: 2.0
+    takeoff_tolerance_m: 0.25
+    target_timeout_s: 6.0
+    odom_topic: "/uav/odometry"
+    spf_goal_topic: "/uav/spf_goal"
+    goal_topic: "/uav/goal"

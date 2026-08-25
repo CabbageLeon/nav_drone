@@ -1,0 +1,18 @@
+/ugv_communicate_node:
+  ros__parameters:
+    tcp_bind_address: "0.0.0.0"
+    tcp_port: 9001
+    odom_topic: "/uav/odometry"
+    image_topic: "/camera/down/image_raw"
+    spf_goal_topic: "/uav/spf_goal"
+    spf_detection_topic: "/uav/spf_detection"
+    ugv_pose_topic: "/ugv/pose"
+    ugv_pose_frame_id: "odom"
+    downward_fov_deg: 108.0
+    camera_yaw_offset_rad: 0.0
+    min_projection_altitude_m: 1.0
+    ugv_to_odom_x_m: 0.0
+    ugv_to_odom_y_m: 0.0
+    ugv_to_odom_z_m: 0.0
+    ugv_to_odom_yaw_rad: 0.0
+    annotated_jpeg_quality: 85

@@ -20,3 +20,42 @@
     max_altitude: 50.0              # meters (ENU)
     min_altitude: 0.5               # meters above ground
     geofence_radius: 100.0          # meters from origin
+
+    # Launch-time node enable flags. Launch files read these values directly;
+    # command line only selects the profile (sitl or real).
+    launch_profiles:
+      sitl:
+        mavros: true
+        realsense: false
+        mission: true
+        spf: true
+        spf_image_test: true
+        ugv_tcp: false
+        delays:
+          bridge_s: 5.0
+          tf_s: 5.5
+          controller_s: 6.0
+          perception_s: 18.0
+          mission_s: 20.0
+      real:
+        mavros: false
+        realsense: true
+        mission: true
+        spf: true
+        spf_image_test: false
+        ugv_tcp: true
+        delays:
+          bridge_s: 0.0
+          tf_s: 0.0
+          controller_s: 0.0
+          perception_s: 1.0
+          mission_s: 2.0
+
+    # RealSense wrapper launch arguments for the real-machine profile.
+    # Current verified hardware exposes infra/depth streams, not RGB color.
+    realsense:
+      enable_color: false
+      enable_depth: false
+      enable_infra1: true
+      enable_infra2: false
+      initial_reset: true

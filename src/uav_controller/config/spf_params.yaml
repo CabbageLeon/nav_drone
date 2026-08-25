@@ -1,0 +1,24 @@
+/spf_node:
+  ros__parameters:
+    image_topic: "/camera/down/image_raw"
+    odom_topic: "/uav/odometry"
+    spf_goal_topic: "/uav/spf_goal"
+    spf_detection_topic: "/uav/spf_detection"
+    decision_interval_s: 3.0
+    downward_fov_deg: 108.0
+    camera_yaw_offset_rad: 0.0
+    max_horizontal_step_m: 5.0
+    height_step_m: 1.0
+    min_altitude_m: 1.5
+    max_altitude_m: 10.0
+    qwen_model: "qwen-vl-max"
+    qwen_base_url: "https://dashscope.aliyuncs.com/compatible-mode/v1"
+    qwen_api_key: "sk-ws-H.ELHYIEE.1QIg.MEQCIC10urrRK-K0icCQzHtSrRp-kXZcKbyKdKNdZL_yxEZPAiAqOGOx-nob6N2GyaORkMSOSzMd6NYrV98R5d09JMsQ0g"
+    target_description: ""
+    target_description_topic: "/uav/target_description"
+    goal_image_path: ""
+    vlm_temperature: 0.1
+    vlm_max_tokens: 256
+    vlm_timeout_s: 30.0
+    save_debug_images: false
+    debug_image_dir: "/tmp/uav_spf"

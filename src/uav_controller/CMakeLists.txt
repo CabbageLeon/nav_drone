@@ -23,6 +23,12 @@ ament_target_dependencies(mission_node rclcpp uav_msgs nav_msgs geometry_msgs)
 install(TARGETS controller_node mission_node
   DESTINATION lib/${PROJECT_NAME}
 )
+install(PROGRAMS
+  src/spf.py
+  src/spf_image_goal_test.py
+  src/ugv_communicate.py
+  DESTINATION lib/${PROJECT_NAME}
+)
 install(DIRECTORY include/ DESTINATION include/${PROJECT_NAME})
 install(DIRECTORY config DESTINATION share/${PROJECT_NAME})
 

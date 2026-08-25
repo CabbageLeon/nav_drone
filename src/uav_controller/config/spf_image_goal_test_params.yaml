@@ -1,0 +1,5 @@
+/spf_image_goal_test:
+  ros__parameters:
+    image_path: "/home/shuning/CarlaAir/carla-air_experiments/episodes/photos/town10hd_001_goal.jpg"
+    frame_id: "camera_down"
+    publish_rate_hz: 1.0
