@@ -26,6 +26,7 @@
     launch_profiles:
       sitl:
         mavros: true
+        lidar: false
         realsense: false
         mission: true
         spf: true
@@ -38,7 +39,8 @@
           perception_s: 18.0
           mission_s: 20.0
       real:
-        mavros: false
+        mavros: true
+        lidar: true
         realsense: true
         mission: true
         spf: true
@@ -50,6 +52,28 @@
           controller_s: 0.0
           perception_s: 1.0
           mission_s: 2.0
+
+    # PX4/MAVROS launch arguments selected by profile.
+    # Real machine uses the udev alias /dev/px4 at 921600 baud.
+    px4:
+      sitl:
+        fcu_url: "udp://:14540@127.0.0.1:14580"
+        gcs_url: ""
+        tgt_system: 1
+        tgt_component: 1
+        fcu_protocol: "v2.0"
+      real:
+        fcu_url: "/dev/px4:921600"
+        gcs_url: ""
+        tgt_system: 1
+        tgt_component: 1
+        fcu_protocol: "v2.0"
+
+    # MID360 / Fast-LIO launch arguments for real-machine localization.
+    lidar:
+      package: "fast_lio"
+      launch: "mapping_mid360.launch.py"
+      rviz: false
 
     # RealSense wrapper launch arguments for the real-machine profile.
     # Current verified hardware exposes infra/depth streams, not RGB color.

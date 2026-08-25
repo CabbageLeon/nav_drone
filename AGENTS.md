@@ -41,6 +41,7 @@ install(PROGRAMS src/examples/foo.py DESTINATION lib/${PROJECT_NAME})  # 注册�
 - MAVROS 的 `setpoint_position` 和 `local_position` 插件在 ROS 侧使用 **ENU**（z 正 = 向上）。MAVROS 内部自动做 ENU↔NED 转换。
 - 在 launch 文件中 MAVROS 的 `Node` action 添加 `emulate_tty=True`,防止手动ctrl+c之后无法正确释放进程
 - 不要高频发送重复的ros info消息，只在诸如状态切换时发送ros info
+- 每次修改完之后执行colcon build --packages-select <修改过的功能包>
 ### 仿真注意事项
 **环境：**
 - 强制 `export RMW_IMPLEMENTATION=rmw_fastrtps_cpp`（Zenoh 需要额外 Router，会导致 topic 发现不了）

@@ -27,6 +27,7 @@ from ament_index_python.packages import get_package_share_directory
 
 _REQUIRED_FLAGS = (
     'mavros',
+    'lidar',
     'realsense',
     'mission',
     'spf',
@@ -125,6 +126,52 @@ def _load_realsense_launch_arguments(params, common_params):
     return {name: _launch_arg_value(realsense[name]) for name in required_args}
 
 
+def _load_px4_parameters(params, profile_name, common_params):
+    px4 = params.get('px4')
+    if not isinstance(px4, dict):
+        raise RuntimeError("Missing 'px4' block in %s" % common_params)
+
+    profile = px4.get(profile_name)
+    if not isinstance(profile, dict):
+        raise RuntimeError("Missing PX4 profile '%s' in %s" % (profile_name, common_params))
+
+    required_args = (
+        'fcu_url',
+        'gcs_url',
+        'tgt_system',
+        'tgt_component',
+        'fcu_protocol',
+    )
+    missing = [name for name in required_args if name not in profile]
+    if missing:
+        raise RuntimeError(
+            "Missing PX4 parameter(s) in %s.%s: %s"
+            % (profile_name, common_params, ', '.join(missing))
+        )
+
+    return {name: profile[name] for name in required_args}
+
+
+def _load_lidar_launch(params, common_params):
+    lidar = params.get('lidar')
+    if not isinstance(lidar, dict):
+        raise RuntimeError("Missing 'lidar' block in %s" % common_params)
+
+    required_args = ('package', 'launch', 'rviz')
+    missing = [name for name in required_args if name not in lidar]
+    if missing:
+        raise RuntimeError(
+            "Missing LiDAR launch argument(s) in %s: %s"
+            % (common_params, ', '.join(missing))
+        )
+
+    return (
+        str(lidar['package']),
+        str(lidar['launch']),
+        {'rviz': _launch_arg_value(lidar['rviz'])},
+    )
+
+
 def _append_with_delay(actions, delay_s, launch_actions):
     if not actions:
         return
@@ -155,22 +202,33 @@ def _launch_setup(context, *args, **kwargs):
 
     launch_actions = []
 
+    if profile['lidar']:
+        lidar_package, lidar_launch_file, lidar_args = _load_lidar_launch(
+            common, common_params)
+        lidar_launch = os.path.join(
+            get_package_share_directory(lidar_package), 'launch', lidar_launch_file)
+        launch_actions.append(GroupAction(
+            scoped=True,
+            forwarding=False,
+            actions=[
+                IncludeLaunchDescription(
+                    PythonLaunchDescriptionSource(lidar_launch),
+                    launch_arguments=lidar_args.items(),
+                ),
+            ],
+        ))
+
     if profile['mavros']:
         mavros_pluginlists = os.path.join(
             get_package_share_directory('mavros'), 'launch', 'px4_pluginlists.yaml')
         mavros_config = os.path.join(
             get_package_share_directory('mavros'), 'launch', 'px4_config.yaml')
+        px4_params = _load_px4_parameters(common, profile_name, common_params)
         launch_actions.append(Node(
             package='mavros', executable='mavros_node',
             namespace='mavros', output='screen',
             emulate_tty=True,
-            parameters=[mavros_pluginlists, mavros_config, {
-                'fcu_url': 'udp://:14540@127.0.0.1:14580',
-                'gcs_url': '',
-                'tgt_system': 1,
-                'tgt_component': 1,
-                'fcu_protocol': 'v2.0',
-            }],
+            parameters=[mavros_pluginlists, mavros_config, px4_params],
         ))
 
     if profile['realsense']:

@@ -82,6 +82,7 @@ public:
     // —— Main loop: 20 Hz ——
     loop_timer_ = create_wall_timer(50ms, std::bind(&Px4BridgeNode::loop, this));
 
+    phase_start_ = get_clock()->now();
     RCLCPP_INFO(get_logger(), "px4_bridge_node (MAVROS) started, odom=%s", odom_conv.c_str());
   }
 
@@ -95,6 +96,7 @@ private:
   geometry_msgs::msg::PoseStamped::SharedPtr local_pos_;
   uav_msgs::msg::ControlCommand::SharedPtr cmd_;
   bool cmd_received_{false};
+  bool land_requested_{false};
 
   // Publishers
   rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr setpoint_pub_;
@@ -201,10 +203,23 @@ private:
 
     if (cmd_received_ && cmd_)
     {
-      // MAVROS expects ENU input on setpoint_position/local (converts to NED internally)
-      sp_x = cmd_->pose.pose.position.x;
-      sp_y = cmd_->pose.pose.position.y;
-      sp_z = cmd_->pose.pose.position.z;
+      if (cmd_->control_mode == uav_msgs::msg::ControlCommand::MODE_LAND)
+      {
+        if (!land_requested_)
+        {
+          RCLCPP_INFO(get_logger(), "→ LAND mode");
+          request_set_mode("AUTO.LAND");
+          land_requested_ = true;
+        }
+        // hold current position while transitioning to LAND
+      }
+      else
+      {
+        // MAVROS expects ENU input on setpoint_position/local (converts to NED internally)
+        sp_x = cmd_->pose.pose.position.x;
+        sp_y = cmd_->pose.pose.position.y;
+        sp_z = cmd_->pose.pose.position.z;
+      }
     }
 
     publish_setpoint_ned(sp_x, sp_y, sp_z);
@@ -236,8 +251,14 @@ private:
     case Phase::ARM:
       if (state_->armed)
       { RCLCPP_INFO(get_logger(), "Armed → CONTROL"); set_phase(Phase::CONTROL); }
-      else if (retry_count_ < 3 && t > 2.0)
-      { retry_count_++; request_arm(true); phase_start_ = get_clock()->now(); }
+      else if (retry_count_ == 0)
+      { retry_count_++; request_arm(true); RCLCPP_INFO(get_logger(), "ARM request sent"); }
+      else if (retry_count_ < 4 && t > 2.0)
+      { retry_count_++; request_arm(true); phase_start_ = get_clock()->now();
+        RCLCPP_WARN(get_logger(), "ARM retry %d/3", retry_count_ - 1); }
+      else if (retry_count_ == 4 && t > 2.0)
+      { retry_count_++;
+        RCLCPP_ERROR(get_logger(), "ARM failed after 4 attempts — check safety switch, COM_RCL_EXCEPT"); }
       break;
 
     case Phase::CONTROL:
