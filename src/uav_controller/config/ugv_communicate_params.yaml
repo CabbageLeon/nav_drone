@@ -1,7 +1,10 @@
 /ugv_communicate_node:
   ros__parameters:
-    tcp_bind_address: "0.0.0.0"
-    tcp_port: 9001
+    ugv_tcp_host: "192.168.249.253"
+    ugv_tcp_port: 18080
+    connect_timeout_s: 5.0
+    connect_retry_s: 2.0
+    ugv_state_timeout_s: 1.5
     odom_topic: "/uav/odometry"
     image_topic: "/camera/down/image_raw"
     spf_goal_topic: "/uav/spf_goal"
@@ -16,3 +19,18 @@
     ugv_to_odom_z_m: 0.0
     ugv_to_odom_yaw_rad: 0.0
     annotated_jpeg_quality: 85
+    planner_enabled: false
+    enable_motion: false
+    decision_interval_s: 3.0
+    path_endpoint_tolerance_px: 200.0
+    waypoint_tolerance_m: 0.6
+    goal_tolerance_m: 2.0
+    timeout_per_waypoint_s: 35.0
+    control_period_s: 0.1
+    stall_timeout_s: 4.0
+    command_ttl_s: 0.45
+    max_linear_speed_mps: 0.30
+    max_angular_speed_rps: 0.80
+    vlm_timeout_s: 30.0
+    save_debug_images: false
+    debug_image_dir: "/tmp/ugv_collab"

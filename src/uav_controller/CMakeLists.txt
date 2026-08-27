@@ -27,6 +27,7 @@ install(PROGRAMS
   src/spf.py
   src/spf_image_goal_test.py
   src/ugv_communicate.py
+  src/tcp_protocol.py
   DESTINATION lib/${PROJECT_NAME}
 )
 install(DIRECTORY include/ DESTINATION include/${PROJECT_NAME})
