@@ -574,8 +574,10 @@ class UgvCommunicateNode(Node):
         image_bgr = self._image_to_bgr(image_msg)
         image_height, image_width = image_bgr.shape[:2]
         center = (image_width // 2, image_height // 2)
-        cv2.drawMarker(image_bgr, center, (0, 255, 0),
-                       markerType=cv2.MARKER_CROSS, markerSize=24, thickness=2)
+        cv2.line(image_bgr, (center[0] - 30, center[1]), (center[0] + 30, center[1]),
+                 (0, 255, 0), 2)
+        cv2.line(image_bgr, (center[0], center[1] - 30), (center[0], center[1] + 30),
+                 (0, 255, 0), 2)
 
         projection = {"image_width": image_width, "image_height": image_height}
         ugv_px = None
@@ -586,16 +588,18 @@ class UgvCommunicateNode(Node):
             ugv_px = self._world_to_pixel(p.x, p.y, odom, image_width, image_height)
             projection["ugv_px"] = ugv_px
             if ugv_px is not None:
-                cv2.circle(image_bgr, (ugv_px["x"], ugv_px["y"]), 12, (255, 0, 0), 2)
-                cv2.putText(image_bgr, "UGV", (ugv_px["x"] + 10, ugv_px["y"] - 8),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.55, (255, 0, 0), 2)
+                cv2.circle(image_bgr, (ugv_px["x"], ugv_px["y"]), 25, (255, 150, 0), 3)
+                cv2.circle(image_bgr, (ugv_px["x"], ugv_px["y"]), 5, (255, 150, 0), -1)
+                cv2.putText(image_bgr, "CAR", (ugv_px["x"] + 15, ugv_px["y"] - 15),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 150, 0), 2)
 
         goal_px = self._detection_to_pixel(spf_detection, image_width, image_height)
         projection["goal_px"] = goal_px
         if goal_px is not None:
-            cv2.circle(image_bgr, (goal_px["x"], goal_px["y"]), 12, (0, 0, 255), 2)
-            cv2.putText(image_bgr, "GOAL", (goal_px["x"] + 10, goal_px["y"] - 8),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0, 0, 255), 2)
+            cv2.circle(image_bgr, (goal_px["x"], goal_px["y"]), 25, (0, 0, 255), 3)
+            cv2.circle(image_bgr, (goal_px["x"], goal_px["y"]), 5, (0, 0, 255), -1)
+            cv2.putText(image_bgr, "GOAL", (goal_px["x"] + 15, goal_px["y"] - 15),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 
         if ugv_px is not None and goal_px is not None:
             cv2.line(image_bgr, (ugv_px["x"], ugv_px["y"]),
